@@ -2,7 +2,7 @@
 
 import math
 import random
-
+import pdb
 import ps2_visualize
 import pylab
 
@@ -76,13 +76,20 @@ class RectangularRoom(object):
         width: an integer > 0
         height: an integer > 0
         """
-        if width or height <=0:
-            raise ValueError("Width or height must be> 0")
+        if width <=0 and height <= 0:
+            #pdb.set_trace()
+            raise ValueError("Width or height must be > 0")
         else:
             self.width = width
             self.height = height
-            self.tiles = int(width * height)
-            self.cleanTiles = 0
+            self.total_tiles = width * height
+            self.cleanTilesCount = 0
+            self.tiles = dict()
+
+        #create room grid as dict with key (x,y) and boolean value for clean or dirty status
+            for w in range(1, self.width+1):
+                for h in range (1, self.height+1):
+                    self.tiles[(w, h)] = False
 
     
     def cleanTileAtPosition(self, pos):
@@ -95,7 +102,9 @@ class RectangularRoom(object):
         """
         x_coord = math.floor(pos.x)
         y_coord = math.floor(pos.y)
-        raise NotImplementedError
+        self.tiles[(x_coord, y_coord)] = True
+        self.cleanTilesCount +=1
+
 
     def isTileCleaned(self, m, n):
         """
@@ -107,7 +116,10 @@ class RectangularRoom(object):
         n: an integer
         returns: True if (m, n) is cleaned, False otherwise
         """
-        raise NotImplementedError
+        if self.tiles[(m, n)] is False:
+            return False
+        else:
+            return True
     
     def getNumTiles(self):
         """
@@ -115,7 +127,7 @@ class RectangularRoom(object):
 
         returns: an integer
         """
-        raise NotImplementedError
+        return self.total_tiles
 
     def getNumCleanedTiles(self):
         """
@@ -123,7 +135,7 @@ class RectangularRoom(object):
 
         returns: an integer
         """
-        raise NotImplementedError
+        return self.cleanTilesCount
 
     def getRandomPosition(self):
         """
@@ -131,7 +143,10 @@ class RectangularRoom(object):
 
         returns: a Position object.
         """
-        raise NotImplementedError
+        x_coord = random.randint(1, self.width)
+        y_coord = random.randint(1, self.height)
+        random_position = Position(x_coord, y_coord)
+        return random_position
 
     def isPositionInRoom(self, pos):
         """
@@ -140,7 +155,12 @@ class RectangularRoom(object):
         pos: a Position object.
         returns: True if pos is in the room, False otherwise.
         """
-        raise NotImplementedError
+        if pos.x >=0 and pos.x <= self.width:
+            if pos.y >=0 and pos.y <= self.height:
+                return True
+        else:
+            return False
+
 
 
 class Robot(object):
