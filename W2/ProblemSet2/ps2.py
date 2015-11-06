@@ -83,12 +83,11 @@ class RectangularRoom(object):
             self.width = width
             self.height = height
             self.total_tiles = width * height
-            self.cleanTilesCount = 0
             self.tiles = dict()
 
         #create room grid as dict with key (x,y) and boolean value for clean or dirty status
-            for w in range(1, self.width+1):
-                for h in range (1, self.height+1):
+            for w in range(0, self.width):
+                for h in range (0, self.height):
                     self.tiles[(w, h)] = False
 
     
@@ -103,7 +102,6 @@ class RectangularRoom(object):
         x_coord = math.floor(pos.x)
         y_coord = math.floor(pos.y)
         self.tiles[(x_coord, y_coord)] = True
-        self.cleanTilesCount +=1
 
 
     def isTileCleaned(self, m, n):
@@ -135,7 +133,13 @@ class RectangularRoom(object):
 
         returns: an integer
         """
-        return self.cleanTilesCount
+        clean_tiles_count = 0
+        for value in self.tiles.values():
+            if value is True:
+                clean_tiles_count+=1
+
+        return clean_tiles_count
+
 
     def getRandomPosition(self):
         """
@@ -143,8 +147,8 @@ class RectangularRoom(object):
 
         returns: a Position object.
         """
-        x_coord = random.randint(1, self.width)
-        y_coord = random.randint(1, self.height)
+        x_coord = random.randint(0, self.width-1)
+        y_coord = random.randint(0, self.height-1)
         random_position = Position(x_coord, y_coord)
         return random_position
 
@@ -155,8 +159,8 @@ class RectangularRoom(object):
         pos: a Position object.
         returns: True if pos is in the room, False otherwise.
         """
-        if pos.x >=0 and pos.x <= self.width:
-            if pos.y >=0 and pos.y <= self.height:
+        if pos.x >=0 and pos.x < self.width:
+            if pos.y >=0 and pos.y <self.height:
                 return True
         else:
             return False
