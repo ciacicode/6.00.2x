@@ -272,10 +272,36 @@ class StandardRobot(Robot):
 
 
 # Uncomment this line to see your implementation of StandardRobot in action!
-# testRobotMovement(StandardRobot, RectangularRoom)
+#testRobotMovement(StandardRobot, RectangularRoom)
 
 
 # === Problem 3
+
+
+def isRoomStillDirty(room, min_coverage):
+    """
+
+    :param room: RectangularRoom object
+    :param min_coverage: float expressing min cleanliness
+    :return: True if room is clean enough, otherwise return False
+    """
+    clean = float(room.getNumCleanedTiles())
+    total = float(room.getNumTiles())
+    if float(clean/total) < min_coverage:
+        return True
+    else:
+        return False
+
+def resetRoomDirtiness(room):
+    """
+
+    :param room:
+    :return: sets all the room tiles back to being dirty
+    """
+    for key in room.tiles.keys():
+        room.tiles[key] = False
+
+
 def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
                   robot_type):
     """
@@ -294,10 +320,38 @@ def runSimulation(num_robots, speed, width, height, min_coverage, num_trials,
     robot_type: class of robot to be instantiated (e.g. StandardRobot or
                 RandomWalkRobot)
     """
-    raise NotImplementedError
+    # create room
+    room = RectangularRoom(width, height)
+    # instantatiate num_robots in the room and at given speed
+    list_of_robots = list()
+    for r in range(num_robots):
+        robot = robot_type(room, speed)
+        list_of_robots.append(robot)
+    # track number of steps
+    trial_steps_list = list()
+    for trial in range(0, num_trials):
+        #anim = ps2_visualize.RobotVisualization(num_robots, width, height, delay=0.5)
+        trial_steps = 0.0
+        while isRoomStillDirty(room, min_coverage):
+            #make the robots clean stuff
+            for robot in list_of_robots:
+                #anim.update(room, list_of_robots)
+                robot.updatePositionAndClean()
+            trial_steps+= 1.0
+        trial_steps_list.append(trial_steps)
+        #anim.done()
+        resetRoomDirtiness(room)
+    # calculate average of steps in trial_steps_list
+    total_steps = 0.0
+    for step_count in trial_steps_list:
+        total_steps += step_count
+    mean = float(total_steps/float(num_trials))
+    return mean
+
+
 
 # Uncomment this line to see how much your simulation takes on average
-##print  runSimulation(1, 1.0, 10, 10, 0.75, 30, StandardRobot)
+# print  runSimulation(1, 1.0, 10, 10, 0.75, 30, StandardRobot)
 
 
 # === Problem 4
@@ -313,7 +367,16 @@ class RandomWalkRobot(Robot):
         Move the robot to a new position and mark the tile it is on as having
         been cleaned.
         """
-        raise NotImplementedError
+        self.angle = random.randint(0, 360)
+        new_position = self.position.getNewPosition(self.angle, self.speed)
+
+        if self.room.isPositionInRoom(new_position) is False:
+            #new position is outside room, time to change angle
+            return self.updatePositionAndClean()
+        else:
+            #new position is inside the room
+            self.position = new_position
+            self.room.cleanTileAtPosition(self.position)
 
 
 def showPlot1(title, x_label, y_label):
