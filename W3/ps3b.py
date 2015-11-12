@@ -3,6 +3,7 @@
 import numpy
 import random
 import pylab
+import pdb
 
 ''' 
 Begin helper code
@@ -58,8 +59,8 @@ class SimpleVirus(object):
         False.
         """
 
-        if random.random() > self.getClearProb():
-            return True, self.getClearProb()
+        if random.random() < self.getClearProb():
+            return True
         else:
             return False
 
@@ -82,7 +83,7 @@ class SimpleVirus(object):
         maxBirthProb and clearProb values as this virus. Raises a
         NoChildException if this virus particle does not reproduce.               
         """
-        if random.random() > self.maxBirthProb * (1-popDensity):
+        if random.random() < self.maxBirthProb * (1-popDensity):
             # reproduce
             return SimpleVirus(self.maxBirthProb, self.clearProb)
         else:
@@ -152,7 +153,30 @@ class Patient(object):
         integer)
         """
 
-        #
+        dead_viruses = list()
+        offspring_viruses = list()
+        current_viruses = self.getViruses()
+        for virus in current_viruses:
+            if virus.doesClear():
+                dead_viruses.append(virus)
+        # update list of viruses by removing dead viruses
+        for dead_virus in dead_viruses:
+            current_viruses.remove(dead_virus)
+
+        popDensity = int(len(current_viruses))/int(self.getMaxPop())
+
+        for survived_virus in current_viruses:
+            try:
+                offspring = survived_virus.reproduce(popDensity)
+                offspring_viruses.append(offspring)
+            except NoChildException:
+                pass
+        # update list of viruses with the new offsprint
+            self.viruses = current_viruses + offspring_viruses
+
+        return self.getTotalPop()
+
+
 
 
 
@@ -280,7 +304,7 @@ class ResistantVirus(SimpleVirus):
         NoChildException if this virus particle does not reproduce.
         """
 
-        # TODO
+        #   TODO
 
             
 
