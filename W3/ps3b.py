@@ -163,7 +163,7 @@ class Patient(object):
         for dead_virus in dead_viruses:
             current_viruses.remove(dead_virus)
 
-        popDensity = int(len(current_viruses))/int(self.getMaxPop())
+        popDensity = float(len(current_viruses))/float(self.getMaxPop())
 
         for survived_virus in current_viruses:
             try:
@@ -199,7 +199,39 @@ def simulationWithoutDrug(numViruses, maxPop, maxBirthProb, clearProb,
     numTrials: number of simulation runs to execute (an integer)
     """
 
-    # TODO
+    step_viruses_dict = dict()
+    time_steps = 300
+    # creates a dictionary where to track total viruses at given steps
+    for step in range(time_steps):
+            step_viruses_dict[step] = 0
+
+    for trial in range(numTrials):
+        viruses = list()
+        for virus in range(numViruses):
+        # instantiate viruses and append them to a list
+            new_virus = SimpleVirus(maxBirthProb, clearProb)
+            viruses.append(new_virus)
+
+        # instantiates a patient
+        patient = Patient(viruses, maxPop)
+
+        for step in range(time_steps):
+            step_viruses_dict[step] = int(step_viruses_dict[step])+int(patient.update())
+
+    # calculate average total viruses per step
+    for key in step_viruses_dict.keys():
+        average = float(step_viruses_dict[key]/numTrials)
+        step_viruses_dict[key] = average
+
+
+    pylab.plot(range(1, time_steps+1), step_viruses_dict.values())
+    pylab.title("Average virus population by time step")
+    pylab.ylabel("Average Virus Population")
+    pylab.xlabel("Steps")
+    pylab.show()
+
+
+
 
 
 
@@ -229,20 +261,22 @@ class ResistantVirus(SimpleVirus):
         the probability of the offspring acquiring or losing resistance to a drug.
         """
 
-        # TODO
+        SimpleVirus.__init__(self, maxBirthProb, clearProb)
+        self.resistances = resistances
+        self.mutProb = mutProb
 
 
     def getResistances(self):
         """
         Returns the resistances for this virus.
         """
-        # TODO
+        return self.resistances
 
     def getMutProb(self):
         """
         Returns the mutation probability for this virus.
         """
-        # TODO
+        return self.mutProb
 
     def isResistantTo(self, drug):
         """
@@ -255,8 +289,11 @@ class ResistantVirus(SimpleVirus):
         returns: True if this virus instance is resistant to the drug, False
         otherwise.
         """
-        
-        # TODO
+
+        if drug in self.getResistances().keys():
+            return self.getResistances()[drug]
+        else:
+            raise ValueError("No such drug")
 
 
     def reproduce(self, popDensity, activeDrugs):
