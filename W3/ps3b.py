@@ -187,23 +187,23 @@ def simulationWithoutDrug(numViruses, maxPop, maxBirthProb, clearProb,
                           numTrials):
     """
     Run the simulation and plot the graph for problem 3 (no drugs are used,
-    viruses do not have any drug resistance).    
+    viruses do not have any drug resistance).
     For each of numTrials trial, instantiates a patient, runs a simulation
     for 300 timesteps, and plots the average virus population size as a
     function of time.
 
     numViruses: number of SimpleVirus to create for patient (an integer)
     maxPop: maximum virus population for patient (an integer)
-    maxBirthProb: Maximum reproduction probability (a float between 0-1)        
+    maxBirthProb: Maximum reproduction probability (a float between 0-1)
     clearProb: Maximum clearance probability (a float between 0-1)
     numTrials: number of simulation runs to execute (an integer)
     """
 
-    step_viruses_dict = dict()
+    step_viruses_list = list()
     time_steps = 300
     # creates a dictionary where to track total viruses at given steps
     for step in range(time_steps):
-            step_viruses_dict[step] = 0
+            step_viruses_list.append(0.0)
 
     for trial in range(numTrials):
         viruses = list()
@@ -216,18 +216,18 @@ def simulationWithoutDrug(numViruses, maxPop, maxBirthProb, clearProb,
         patient = Patient(viruses, maxPop)
 
         for step in range(time_steps):
-            step_viruses_dict[step] = int(step_viruses_dict[step])+int(patient.update())
+            step_viruses_list[step] = float(step_viruses_list[step])+float(patient.update())
 
     # calculate average total viruses per step
-    for key in step_viruses_dict.keys():
-        average = float(step_viruses_dict[key]/numTrials)
-        step_viruses_dict[key] = average
+    for virus_count in range(len(step_viruses_list)):
+        average = float(step_viruses_list[virus_count])/float(numTrials)
+        step_viruses_list[virus_count] = average
 
-
-    pylab.plot(range(1, time_steps+1), step_viruses_dict.values())
+    pylab.plot(step_viruses_list, label="average virus population")
     pylab.title("Average virus population by time step")
-    pylab.ylabel("Average Virus Population")
     pylab.xlabel("Steps")
+    pylab.ylabel("Average Virus Population")
+    pylab.legend(loc='upper right')
     pylab.show()
 
 
@@ -289,11 +289,10 @@ class ResistantVirus(SimpleVirus):
         returns: True if this virus instance is resistant to the drug, False
         otherwise.
         """
-
         if drug in self.getResistances().keys():
             return self.getResistances()[drug]
         else:
-            raise ValueError("No such drug")
+            return False
 
 
     def reproduce(self, popDensity, activeDrugs):
@@ -341,7 +340,37 @@ class ResistantVirus(SimpleVirus):
         NoChildException if this virus particle does not reproduce.
         """
 
-        #   TODO
+        #check that there is no active drug to which the virus is not resistant to
+
+        if len(activeDrugs) > 0:
+            for drug in activeDrugs:
+                if drug in self.getResistances().keys():
+                    #check that this doesn't have value False
+                    if self.getResistances()[drug] is False:
+                        #no chance of reproduction
+                        raise NoChildException
+                    else:
+                        pass
+        else:
+            pass
+
+        new_resistance = dict()
+        for drug in self.getResistances().keys():
+            if random.random() < (1 - self.getMutProb()):
+                #inherits same trait of parent
+                new_resistance[drug] = self.getResistances()[drug]
+            else:
+                #changes trait
+                new_resistance[drug] = not self.getResistances()[drug]
+
+        #if we are here no exception was raised, meaning the virus is resistant to all active drugs
+        if random.random() < self.maxBirthProb * (1-popDensity):
+            # reproduce
+            return ResistantVirus(self.maxBirthProb, self.clearProb, new_resistance, self.mutProb)
+        else:
+            raise NoChildException
+
+
 
             
 
