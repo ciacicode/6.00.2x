@@ -392,7 +392,8 @@ class TreatedPatient(Patient):
         maxPop: The  maximum virus population for this patient (an integer)
         """
 
-        # TODO
+        Patient.__init__(self, viruses, maxPop)
+        self.prescribedDrugs = list()
 
 
     def addPrescription(self, newDrug):
@@ -405,9 +406,8 @@ class TreatedPatient(Patient):
 
         postcondition: The list of drugs being administered to a patient is updated
         """
-
-        # TODO
-
+        if newDrug not in self.prescribedDrugs:
+            self.prescribedDrugs.append(newDrug)
 
     def getPrescriptions(self):
         """
@@ -417,7 +417,7 @@ class TreatedPatient(Patient):
         patient.
         """
 
-        # TODO
+        return self.prescribedDrugs
 
 
     def getResistPop(self, drugResist):
@@ -432,8 +432,20 @@ class TreatedPatient(Patient):
         drugs in the drugResist list.
         """
 
-        # TODO
-
+        virus_population = self.getViruses()
+        resistant_count = 0
+        for virus in virus_population:
+            bool_check = list()
+            for drug in drugResist:
+                if virus.isResistantTo(drug) is True:
+                    bool_check.append(True)
+                else:
+                    bool_check.append(False)
+            if False in bool_check:
+                pass
+            else:
+                resistant_count+=1
+        return resistant_count
 
     def update(self):
         """
@@ -456,7 +468,28 @@ class TreatedPatient(Patient):
         integer)
         """
 
-        # TODO
+        dead_viruses = list()
+        offspring_viruses = list()
+        current_viruses = self.getViruses()
+        for virus in current_viruses:
+            if virus.doesClear():
+                dead_viruses.append(virus)
+        # update list of viruses by removing dead viruses
+        for dead_virus in dead_viruses:
+            current_viruses.remove(dead_virus)
+
+        popDensity = float(len(current_viruses))/float(self.getMaxPop())
+
+        for survived_virus in current_viruses:
+            try:
+                offspring = survived_virus.reproduce(popDensity, self.getPrescriptions())
+                offspring_viruses.append(offspring)
+            except NoChildException:
+                pass
+        # update list of viruses with the new offsprint
+            self.viruses = current_viruses + offspring_viruses
+
+        return self.getTotalPop()
 
 
 
