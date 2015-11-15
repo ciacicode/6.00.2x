@@ -519,4 +519,44 @@ def simulationWithDrug(numViruses, maxPop, maxBirthProb, clearProb, resistances,
     
     """
 
-    # TODO
+    step_viruses_any = list()
+    step_viruses_resistant = list()
+    time_steps = 300
+    # creates a dictionary where to track total and resistant viruses at given steps
+    for step in range(time_steps):
+            step_viruses_any.append(0.0)
+            step_viruses_resistant.append(0.0)
+
+    for trial in range(numTrials):
+        viruses = list()
+        for virus in range(numViruses):
+        # instantiate viruses and append them to a list
+            new_virus = ResistantVirus(maxBirthProb, clearProb, resistances, mutProb)
+            viruses.append(new_virus)
+
+        # instantiates a patient
+        patient = TreatedPatient(viruses, maxPop)
+
+        for step in range(time_steps):
+            if step < time_steps/2:
+                step_viruses_any[step] = float(step_viruses_any[step])+float(patient.update())
+                step_viruses_resistant[step] = float(step_viruses_resistant[step]) + float(patient.getResistPop(['guttagonol']))
+            else:
+                patient.addPrescription('guttagonol')
+                step_viruses_any[step] = float(step_viruses_any[step])+float(patient.update())
+                step_viruses_resistant[step] = float(step_viruses_resistant[step]) + float(patient.getResistPop(['guttagonol']))
+    # calculate average total viruses per step
+
+    for virus_count in range(len(step_viruses_any)):
+        any_virus_average = float(step_viruses_any[virus_count])/float(numTrials)
+        resistant_virus_average = float(step_viruses_resistant[virus_count]/float(numTrials))
+        step_viruses_any[virus_count] = any_virus_average
+        step_viruses_resistant[virus_count] = resistant_virus_average
+
+    pylab.plot(step_viruses_any, 'b', label="average virus population")
+    pylab.plot(step_viruses_resistant,'g', label='virus resistant population')
+    pylab.title("Virus population by time step")
+    pylab.xlabel("Steps")
+    pylab.ylabel("Virus Population")
+    pylab.legend(loc='upper right')
+    pylab.show()
