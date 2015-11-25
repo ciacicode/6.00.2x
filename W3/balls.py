@@ -71,22 +71,19 @@ class Bucket(object):
 
 
 
-def noReplacementSimulation(numTrials):
+def drawing_without_replacement_sim(numTrials):
     '''
     Runs numTrials trials of a Monte Carlo simulation
     of drawing 3 balls out of a bucket containing
-    3 red and 3 green balls. Balls are not replaced once
-    drawn. Returns the a decimal - the fraction of times 3
-    balls of the same color were drawn.
+    4 red and 4 green balls. Balls are not replaced once
+    drawn. Returns a float - the fraction of times 3
+    balls of the same color were drawn in the first 3 draws.
     '''
     # Your code here
-
-
-
     successful_trial_results = 0.0
     for trial in range(numTrials):
         # Create Bucket object as specified
-        b = Bucket(6, "red", "green")
+        b = Bucket(8, "red", "green")
         #create list to track colors
         colors_drawn = list()
         for draw in range(3):
