@@ -496,8 +496,8 @@ class TreatedPatient(Patient):
 #
 # PROBLEM 5
 #
-def simulationWithDrug(numViruses, maxPop, maxBirthProb, clearProb, resistances,
-                       mutProb, numTrials):
+def simulationWithDrug(numTrials, timesteps_nodrug, numViruses = 100, maxPop= 1000, maxBirthProb = 0.1, clearProb = 0.05, resistances = {'guttagonol': False},
+                       mutProb=0.005,timesteps_afterdrug = 150,  ):
     """
     Runs simulations and plots graphs for problem 5.
 
@@ -521,7 +521,8 @@ def simulationWithDrug(numViruses, maxPop, maxBirthProb, clearProb, resistances,
 
     step_viruses_any = list()
     step_viruses_resistant = list()
-    time_steps = 300
+    trial_viruses = list()
+    time_steps = timesteps_nodrug + timesteps_afterdrug
     # creates a dictionary where to track total and resistant viruses at given steps
     for step in range(time_steps):
             step_viruses_any.append(0.0)
@@ -538,25 +539,39 @@ def simulationWithDrug(numViruses, maxPop, maxBirthProb, clearProb, resistances,
         patient = TreatedPatient(viruses, maxPop)
 
         for step in range(time_steps):
-            if step < time_steps/2:
-                step_viruses_any[step] = float(step_viruses_any[step])+float(patient.update())
-                step_viruses_resistant[step] = float(step_viruses_resistant[step]) + float(patient.getResistPop(['guttagonol']))
+            if step < timesteps_nodrug:
+                # step_viruses_any[step] = float(step_viruses_any[step])+float(patient.update())
+                # step_viruses_resistant[step] = float(step_viruses_resistant[step]) + float(patient.getResistPop(['guttagonol']))
+                step_viruses_any[step] = float(patient.update())
             else:
                 patient.addPrescription('guttagonol')
-                step_viruses_any[step] = float(step_viruses_any[step])+float(patient.update())
-                step_viruses_resistant[step] = float(step_viruses_resistant[step]) + float(patient.getResistPop(['guttagonol']))
+                # step_viruses_any[step] = float(step_viruses_any[step])+float(patient.update())
+                # step_viruses_resistant[step] = float(step_viruses_resistant[step]) + float(patient.getResistPop(['guttagonol']))
+                step_viruses_any[step] = float(patient.update())
     # calculate average total viruses per step
 
-    for virus_count in range(len(step_viruses_any)):
-        any_virus_average = float(step_viruses_any[virus_count])/float(numTrials)
-        resistant_virus_average = float(step_viruses_resistant[virus_count]/float(numTrials))
-        step_viruses_any[virus_count] = any_virus_average
-        step_viruses_resistant[virus_count] = resistant_virus_average
+    # for virus_count in range(len(step_viruses_any)):
+    #     any_virus_average = float(step_viruses_any[virus_count])/float(numTrials)
+    #     resistant_virus_average = float(step_viruses_resistant[virus_count]/float(numTrials))
+    #     step_viruses_any[virus_count] = any_virus_average
+    #     step_viruses_resistant[virus_count] = resistant_virus_average
 
-    pylab.plot(step_viruses_any, 'b', label="average virus population")
-    pylab.plot(step_viruses_resistant,'g', label='virus resistant population')
-    pylab.title("Virus population by time step")
-    pylab.xlabel("Steps")
-    pylab.ylabel("Virus Population")
-    pylab.legend(loc='upper right')
-    pylab.show()
+        # get final virus population
+        trial_viruses.append((trial, step_viruses_any[-1]))
+        # identify total virus population per trial
+
+    return trial_viruses
+
+#simulationWithDrug(100, 1000, 0.1, 0.05, {}, 0.005, 5, 300, 150)
+#simulationWithDrug(100, 1000, 0.1, 0.05, {}, 0.005, 5, 150, 150)
+#simulationWithDrug(100, 1000, 0.1, 0.05, {}, 0.005, 5, 75, 150)
+#simulationWithDrug(100, 1000, 0.1, 0.05, {}, 0.005, 5, 0, 150)
+#simulationWithDrug(100, 1000, 0.1, 0.05, {"guttagonol": False}, 0.005, 5, 300, 150)
+#simulationWithDrug(100, 1000, 0.1, 0.05, {"guttagonol": False}, 0.005, 5, 150, 150)
+#simulationWithDrug(100, 1000, 0.1, 0.05, {"guttagonol": False}, 0.005, 5, 75, 150)
+#simulationWithDrug(100, 1000, 0.1, 0.05, {"guttagonol": False}, 0.005, 5, 0, 150)
+#simulationWithDrug(100, 1000, 0.1, 0.05, {"guttagonol": False}, 0.005, 1, 300, 150)
+#simulationWithDrug(100, 1000, 0.1, 0.05, {"guttagonol": False}, 0.005, 1, 150, 150)
+#simulationWithDrug(100, 1000, 0.1, 0.05, {"guttagonol": False}, 0.005, 1, 75, 150)
+#simulationWithDrug(100, 1000, 0.1, 0.05, {"guttagonol": False}, 0.005, 1, 0, 150)
+#
