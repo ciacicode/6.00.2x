@@ -22,10 +22,10 @@ def simulationDelayedTreatment(numTrials):
     numTrials: number of simulation runs to execute (an integer)
     """
     
-    three_hundred_tuple =  simulationWithDrug(numTrials, 300 )
-    hundred_fifty_tuple = simulationWithDrug(numTrials, 150 )
-    seventy_five_tuple = simulationWithDrug(numTrials, 75 )
-    zero_tuple = simulationWithDrug(numTrials, 0 )
+    three_hundred_tuple =  simulationWithDrug(numTrials, 300, maxBirthProb = 0.2 )
+    hundred_fifty_tuple = simulationWithDrug(numTrials, 150, maxBirthProb = 0.2  )
+    seventy_five_tuple = simulationWithDrug(numTrials, 75, maxBirthProb = 0.2 )
+    zero_tuple = simulationWithDrug(numTrials, 0, maxBirthProb = 0.2  )
 
     three_h = zip(*three_hundred_tuple)[1]
     hun_fifty = zip(*hundred_fifty_tuple)[1]
@@ -47,7 +47,7 @@ def simulationDelayedTreatment(numTrials):
     pylab.subplot(4,1,4)
     pylab.hist(zer, bins=20)
     pylab.title("0 delayed steps")
-    pylab.show()
+    pylab.savefig('W4/ppset4-maxBirthProb0.2.png', bbox_inches='tight')
 
 
 
@@ -70,4 +70,26 @@ def simulationTwoDrugsDelayedTreatment(numTrials):
 
     numTrials: number of simulation runs to execute (an integer)
     """
-    # TODO
+    three_hundred = simulationWithMultipleDrug(numTrials, 300 )
+    hundred_fifty = simulationWithMultipleDrug(numTrials, 150,)
+    seventy_five = simulationWithMultipleDrug(numTrials, 75)
+    zero = simulationWithMultipleDrug(numTrials, 0 )
+
+
+
+    pylab.subplot(4,1,1)
+    pylab.hist(three_hundred, bins=20)
+    pylab.title("300 guttagonol steps")
+
+    pylab.subplot(4,1,2)
+    pylab.hist(hundred_fifty, bins=20)
+    pylab.title("150 guttagonol steps")
+
+    pylab.subplot(4,1,3)
+    pylab.hist(seventy_five, bins=20)
+    pylab.title("75 guttagonol steps")
+
+    pylab.subplot(4,1,4)
+    pylab.hist(zero, bins=20)
+    pylab.title("0 guttagonol steps")
+    pylab.savefig('W4/ProblemSet4/secondproblem/highermutprob.png', bbox_inches='tight')

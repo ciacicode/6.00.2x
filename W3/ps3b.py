@@ -562,16 +562,60 @@ def simulationWithDrug(numTrials, timesteps_nodrug, numViruses = 100, maxPop= 10
 
     return trial_viruses
 
-#simulationWithDrug(100, 1000, 0.1, 0.05, {}, 0.005, 5, 300, 150)
-#simulationWithDrug(100, 1000, 0.1, 0.05, {}, 0.005, 5, 150, 150)
-#simulationWithDrug(100, 1000, 0.1, 0.05, {}, 0.005, 5, 75, 150)
-#simulationWithDrug(100, 1000, 0.1, 0.05, {}, 0.005, 5, 0, 150)
-#simulationWithDrug(100, 1000, 0.1, 0.05, {"guttagonol": False}, 0.005, 5, 300, 150)
-#simulationWithDrug(100, 1000, 0.1, 0.05, {"guttagonol": False}, 0.005, 5, 150, 150)
-#simulationWithDrug(100, 1000, 0.1, 0.05, {"guttagonol": False}, 0.005, 5, 75, 150)
-#simulationWithDrug(100, 1000, 0.1, 0.05, {"guttagonol": False}, 0.005, 5, 0, 150)
-#simulationWithDrug(100, 1000, 0.1, 0.05, {"guttagonol": False}, 0.005, 1, 300, 150)
-#simulationWithDrug(100, 1000, 0.1, 0.05, {"guttagonol": False}, 0.005, 1, 150, 150)
-#simulationWithDrug(100, 1000, 0.1, 0.05, {"guttagonol": False}, 0.005, 1, 75, 150)
-#simulationWithDrug(100, 1000, 0.1, 0.05, {"guttagonol": False}, 0.005, 1, 0, 150)
-#
+def simulationWithMultipleDrug(numTrials, timesteps_firstdrug, numViruses = 100, maxPop= 1000, maxBirthProb = 0.2, clearProb = 0.05, resistances = {'guttagonol': False, 'grimpex': False},
+                       mutProb=0.01,timesteps_afterdrug = 150, timesteps_nodrug= 150 ):
+    """
+    Runs simulations and plots graphs for problem 5.
+
+    For each of numTrials trials, instantiates a patient, runs a simulation for
+    150 timesteps, adds guttagonol, and runs the simulation for an additional
+    150 timesteps.  At the end plots the average virus population size
+    (for both the total virus population and the guttagonol-resistant virus
+    population) as a function of time.
+
+    numViruses: number of ResistantVirus to create for patient (an integer)
+    maxPop: maximum virus population for patient (an integer)
+    maxBirthProb: Maximum reproduction probability (a float between 0-1)
+    clearProb: maximum clearance probability (a float between 0-1)
+    resistances: a dictionary of drugs that each ResistantVirus is resistant to
+                 (e.g., {'guttagonol': False})
+    mutProb: mutation probability for each ResistantVirus particle
+             (a float between 0-1).
+    numTrials: number of simulation runs to execute (an integer)
+
+    """
+
+    step_viruses_any = list()
+    step_viruses_resistant = list()
+    trial_viruses = list()
+    time_steps = timesteps_nodrug + timesteps_afterdrug + timesteps_firstdrug
+    # creates a dictionary where to track total and resistant viruses at given steps
+    for step in range(time_steps):
+            step_viruses_any.append(0.0)
+            step_viruses_resistant.append(0.0)
+
+    for trial in range(numTrials):
+        viruses = list()
+        for virus in range(numViruses):
+        # instantiate viruses and append them to a list
+            new_virus = ResistantVirus(maxBirthProb, clearProb, resistances, mutProb)
+            viruses.append(new_virus)
+
+        # instantiates a patient
+        patient = TreatedPatient(viruses, maxPop)
+
+        for step in range(time_steps):
+            if step < timesteps_nodrug:
+                step_viruses_any[step] = float(patient.update())
+            elif step > timesteps_firstdrug:
+                patient.addPrescription('guttagonol')
+                step_viruses_any[step] = float(patient.update())
+            else:
+                patient.addPrescription('grimpex')
+                step_viruses_any[step] = float(patient.update())
+
+        # get final virus population
+        trial_viruses.append(step_viruses_any[-1])
+        # identify total virus population per trial
+
+    return trial_viruses
