@@ -1,6 +1,7 @@
 __author__ = 'ciacicode'
 
 import itertools
+import pdb
 
 class Node(object):
     def __init__(self, name):
@@ -29,8 +30,7 @@ class WeightedEdge(Edge):
     def getWeight(self):
         return self.weight
     def __str__(self):
-        return str(self.src) + '->(' + str(self.weight) + ')'\
-            + str(self.dest)
+        return str(self.src) + '->' +  str(self.dest) + ' (' + str(self.weight) + ')'
 
 class Digraph(object):
     def __init__(self):
@@ -77,8 +77,11 @@ def printPath(path):
     return result
 
 
-def makeGrah():
+def makeGraph():
+
     nodes = []
+    edges = []
+    node_dict = dict()
     nodes.append(Node("ABC")) # nodes[0]
     nodes.append(Node("ACB")) # nodes[1]
     nodes.append(Node("BAC")) # nodes[2]
@@ -88,6 +91,15 @@ def makeGrah():
     g = Graph()
     for n in nodes:
         g.addNode(n)
+        node_dict[n.name] = n
+    edges = [['ABC', 'ACB'], ['ABC', 'BAC'], ['ACB', 'CAB'], ['BAC', 'BCA'], ['BCA', 'CBA'], ['CAB', 'CBA']]
+    for edge in edges:
+        # find the other nodes
+        src = node_dict[edge[1]]
+        dest = node_dict[edge[0]]
+        # create an edge
+        new_edge = Edge(src, dest)
+        g.addEdge(new_edge)
+    return g
 
-    # generate pair permutations
 

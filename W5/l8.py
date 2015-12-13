@@ -18,7 +18,7 @@ def yieldAllCombos(items):
             # test bit jth of integer i
             if (i/3**j) % 3 == 1:
                 bag1.append(items[j])
-            elif (i/3**j) % 3 ==2:
+            elif (i/3**j) % 3 == 2:
                 bag2.append(items[j])
         yield bag1, bag2
 
