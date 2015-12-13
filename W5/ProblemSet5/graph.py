@@ -4,6 +4,8 @@
 # A set of data structures to represent graphs
 #
 
+import pdb
+
 class Node(object):
     def __init__(self, name):
         self.name = str(name)
@@ -43,7 +45,7 @@ class WeightedEdge(Edge):
     def getTotalDistance(self):
         return self.tot
 
-    def getOutDoorDistance(self):
+    def getOutdoorDistance(self):
         return self.outd
 
     def __str__(self):
@@ -84,3 +86,51 @@ class Digraph(object):
             for d in self.edges[str(k)]:
                 res = '{0}{1}->{2}\n'.format(res, k, d)
         return res[:-1]
+
+class WeightedDigraph(Digraph):
+    def __init__(self):
+        Digraph.__init__(self)
+
+    def addEdge(self, edge):
+        edge_info = list()
+        src = edge.getSource()
+        dest = edge.getDestination()
+        tot = edge.getTotalDistance()
+        outd = edge.getOutdoorDistance()
+        distance = (tot, outd)
+        edge_info.append(dest)
+        edge_info.append(distance)
+        #pdb.set_trace()
+        if not(src in self.nodes and dest in self.nodes):
+            raise ValueError('Node not in graph')
+        self.edges[src].append(edge_info)
+
+    def childrenOf(self, node):
+        return self.edges[node]
+
+    def getEdges(self):
+        return self.edges
+
+    def __str__(self):
+        edges = self.getEdges()
+        for edge in edges:
+            print edge
+
+
+def test_weighted_digraph():
+    na = Node('a')
+    nb = Node('b')
+    nc = Node('c')
+    # create graph
+    g = WeightedDigraph()
+    g.addNode(na)
+    g.addNode(nb)
+    g.addNode(nc)
+    #create edges
+    e1 = WeightedEdge(na, nb, 10, 3)
+    e2 = WeightedEdge(na, nc, 3, 1)
+    #add edges
+    g.addEdge(e1)
+    g.addEdge(e2)
+
+    return g
