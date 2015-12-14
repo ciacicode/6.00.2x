@@ -100,37 +100,47 @@ class WeightedDigraph(Digraph):
         distance = (tot, outd)
         edge_info.append(dest)
         edge_info.append(distance)
-        #pdb.set_trace()
         if not(src in self.nodes and dest in self.nodes):
             raise ValueError('Node not in graph')
         self.edges[src].append(edge_info)
 
     def childrenOf(self, node):
-        return self.edges[node]
-
-    def getEdges(self):
-        return self.edges
+        children = list()
+        for child in self.edges[node]:
+            children.append(child[0].name)
+        return children
 
     def __str__(self):
-        edges = self.getEdges()
-        for edge in edges:
-            print edge
+        #a->b (15.0, 10.0)
+        #a->c (14.0, 6.0)
+        #b->c (3.0, 1.0)
+        res = ''
+        for key in self.edges.keys():
+            for value in self.edges[key]:
+                edge = ''
+                destination = value[0].name
+                raw_tuple = value[1]
+                tot = float(raw_tuple[0])
+                outd = float(raw_tuple[1])
+                formatted_tuple = (tot, outd)
+                edge += str(key) + '->' + destination + ' ' + str(formatted_tuple) + '\n'
+                res += edge
+        return res
+
 
 
 def test_weighted_digraph():
-    na = Node('a')
-    nb = Node('b')
-    nc = Node('c')
-    # create graph
+    nj = Node('j')
+    nk = Node('k')
+    nm = Node('m')
+    ng = Node('g')
     g = WeightedDigraph()
-    g.addNode(na)
-    g.addNode(nb)
-    g.addNode(nc)
-    #create edges
-    e1 = WeightedEdge(na, nb, 10, 3)
-    e2 = WeightedEdge(na, nc, 3, 1)
-    #add edges
-    g.addEdge(e1)
-    g.addEdge(e2)
+    g.addNode(nj)
+    g.addNode(nk)
+    g.addNode(nm)
+    g.addNode(ng)
+    g.addEdge(WeightedEdge(nk, nj, 10, 12))
+    g.addEdge(WeightedEdge(nk, nm, 30, 2))
+    g.addEdge(WeightedEdge(nm, ng, 34, 45))
 
-    return g
+    print g
