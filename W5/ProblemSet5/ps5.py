@@ -108,8 +108,38 @@ def bruteForceSearch(digraph, start, end, maxTotalDist, maxDistOutdoors):
         If there exists no path that satisfies maxTotalDist and
         maxDistOutdoors constraints, then raises a ValueError.
     """
-    #TODO
-    pass
+    #Navigate the entire graph and find all possbile paths to the end
+
+    #Create recursive function that DOES use the path variable and find ALL paths
+    #Return the results indicating the totaldistance and the maximumoutdoordistance
+    #Data structure can be: [ [[n1, n2, n3, n4 ...],(tot, outd)], [...] ]
+
+
+
+    #Select the path that satisfies the maxTotalDistance and Outdoor distance
+
+
+def DFS(graph, start, end, path = [], shortest = None):
+    #assumes graph is a Digraph
+    #assumes start and end are nodes in graph
+    all_paths = list()
+    path = path + [start]
+    if start == end:
+        all_paths.append(path)
+    for node in graph.childrenOf(start):
+        if node not in path: #avoid cycles
+            newPath = DFS(graph,node,end,path,shortest)
+            if newPath != None:
+                return newPath
+    return all_paths
+
+def testSP():
+    g = load_map('mit_map.txt')
+    nodes = list(g.nodes)
+    sp = bruteForceSearch(g, nodes[0], nodes[9],45, 39 )
+    print sp
+
+
 
 #
 # Problem 4: Finding the Shorest Path using Optimized Search Method
