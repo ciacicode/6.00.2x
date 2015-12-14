@@ -5,7 +5,8 @@
 
 import string
 # This imports everything from `graph.py` as if it was defined in this file!
-from graph import * 
+from graph import *
+import pdb
 
 #
 # Problem 2: Building up the Campus Map
@@ -35,9 +36,46 @@ def load_map(mapFilename):
     Returns:
         a directed graph representing the map
     """
-    # TODO
     print "Loading map from file..."
-        
+    PATH = "/home/maria/Desktop/ciacicode/6.00.2x/W5/ProblemSet5/"
+    # map: list of nodes, edges values
+    try:
+        mapFilename = open(PATH + mapFilename, 'r', 0)
+        # create graph
+    except IOError:
+        print ('Cannot find file ' + mapFilename)
+    else:
+        g = WeightedDigraph()
+        for line in mapFilename:
+            #split string to list
+            line_data = line.split()
+            #create and add Nodes
+            src = Node(str(line_data[0]))
+            dest = Node(str(line_data[1]))
+            try:
+                g.addNode(src)
+                g.addNode(dest)
+                #create Edge and add it
+                edge = WeightedEdge(src, dest, float(line_data[2]), float(line_data[3]))
+                g.addEdge(edge)
+            except ValueError:
+                #insist
+                try:
+                    g.addNode(dest)
+                    edge = WeightedEdge(src, dest, float(line_data[2]), float(line_data[3]))
+                    g.addEdge(edge)
+                except ValueError:
+                    try:
+                        edge = WeightedEdge(src, dest, float(line_data[2]), float(line_data[3]))
+                        g.addEdge(edge)
+                    except ValueError:
+                        try:
+                            g.addEdge(edge)
+                        except ValueError:
+                            pass
+
+        return g
+
 
 #
 # Problem 3: Finding the Shortest Path using Brute Force Search
