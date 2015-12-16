@@ -126,11 +126,9 @@ def DFS(graph, start, end, path = [], shortest = None):
     path = path + [start]
     if start == end:
         all_paths.append(path)
-    for node in graph.childrenOf(start):
+    for node in graph.childrenOf(Node(start)):
         if node not in path: #avoid cycles
-            newPath = DFS(graph,node,end,path,shortest)
-            if newPath != None:
-                return newPath
+            all_paths += DFS(graph,node,end,path,shortest)
     return all_paths
 
 def testSP():
