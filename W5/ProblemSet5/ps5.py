@@ -109,19 +109,35 @@ def bruteForceSearch(digraph, start, end, maxTotalDist, maxDistOutdoors):
         maxDistOutdoors constraints, then raises a ValueError.
     """
     #Navigate the entire graph and find all possbile paths to the end
-
     #Create recursive function that DOES use the path variable and find ALL paths
+    all_paths = DFS(digraph, start, end)
     #Return the results indicating the totaldistance and the maximumoutdoordistance
     #Data structure can be: [ [[n1, n2, n3, n4 ...],(tot, outd)], [...] ]
+    good_paths = list()
+    for path in all_paths:
+        #calculate the info about distances
+        distance_data = 0
+        distance_data = calculate_total_distances(digraph, path)
+        if distance_data[0] <= float(maxTotalDist) and distance_data[1] <= float(maxDistOutdoors):
+            #path is decent
+            good_paths.append([path, distance_data])
 
+    if len(good_paths) == 0:
+        raise ValueError
+    else:
+        shortest_distance = good_paths[0][1][0]
+        shortest_path = good_paths[0][0]
+        pdb.set_trace()
+        for gp in good_paths:
+            if gp[1][0] < shortest_distance:
+                shortest_path = gp[0]
 
-
-    #Select the path that satisfies the maxTotalDistance and Outdoor distance
+    return shortest_path
 
 
 def DFS(graph, start, end, path = [], shortest = None):
-    #assumes graph is a Digraph
-    #assumes start and end are nodes in graph
+    if not path:
+        path = []
     all_paths = list()
     path = path + [start]
     if start == end:
@@ -131,10 +147,36 @@ def DFS(graph, start, end, path = [], shortest = None):
             all_paths += DFS(graph,node,end,path,shortest)
     return all_paths
 
+def calculate_total_distances(g, path):
+    """
+    :param graph:
+    :param path:
+    :return:  list [[n1, n2, n3, n4 ...],(tot, outd)]
+    """
+    tot_distance = 0
+    outd_distance = 0
+    edges = g.edges
+    for n in range(len(path)):
+        node = path[n]
+        #get the distance data
+        e = edges[Node(node)]
+        for el in e:
+            try:
+                if el[0].name == path[n+1]:
+                    #we found a relevant edge
+                    tot_distance += float(el[1][0])
+                    outd_distance += float(el[1][1])
+            except IndexError:
+                pass
+
+    return (tot_distance, outd_distance)
+
+
+
+
 def testSP():
-    g = load_map('mit_map.txt')
-    nodes = list(g.nodes)
-    sp = bruteForceSearch(g, nodes[0], nodes[9],45, 39 )
+    g = load_map('map2.txt')
+    sp = bruteForceSearch(g, "1", "3", 18, 18 )
     print sp
 
 
